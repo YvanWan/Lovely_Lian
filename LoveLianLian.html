@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>给最可爱的莲莲 💖</title>
+  <style>
+    :root{
+      --bg: #fff7fb;
+      --pink: #ff8fab;
+      --hot: #ff477e;
+      --lav: #a78bfa;
+      --card: #ffffff;
+      --text: #222;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", Arial, sans-serif;
+      background: radial-gradient(1200px 1200px at 20% 0%, #ffe0f0 0%, var(--bg) 35%),
+                  radial-gradient(1000px 800px at 80% 100%, #efe9ff 0%, var(--bg) 40%);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    /* 飘动小心心背景 */
+    .hearts{position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden}
+    .heart{position:absolute; width:14px; height:14px; transform:rotate(45deg); opacity:.6; animation:float 10s linear infinite}
+    .heart:before,.heart:after{content:""; position:absolute; width:14px; height:14px; background:currentColor; border-radius:50%}
+    .heart:before{left:-7px}
+    .heart:after{top:-7px}
+    @keyframes float{0%{transform:translateY(110vh) rotate(45deg)}100%{transform:translateY(-10vh) rotate(45deg)}}
+
+    /* 布局 */
+    .wrap{position:relative; z-index:1; padding:32px; max-width:980px; margin:0 auto}
+    .title{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+    .badge{background:linear-gradient(135deg,var(--hot),var(--pink)); color:#fff; padding:8px 14px; border-radius:999px; font-weight:700; letter-spacing:.5px; box-shadow:0 10px 20px rgba(255,71,126,.25)}
+    h1{margin:8px 0 0; font-size:clamp(28px,4vw,42px)}
+    .grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:18px; margin-top:24px}
+    .card{background:var(--card); border-radius:20px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.06); position:relative}
+    .card h3{margin:0 0 10px; font-size:18px}
+    .big{font-size:clamp(18px,2.2vw,22px)}
+    button{cursor:pointer; border:0; border-radius:14px; padding:10px 14px; font-weight:700; background:linear-gradient(135deg,var(--lav),var(--pink)); color:#fff; box-shadow:0 8px 20px rgba(167,139,250,.35); transition:transform .05s ease}
+    button:active{transform:translateY(1px)}
+    .muted{opacity:.75; font-size:13px}
+    .pill{display:inline-block; padding:6px 10px; background:#00000008; border-radius:999px; font-size:12px}
+    .flex{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .center{text-align:center}
+    .coupon{display:inline-block; border:2px dashed #ff86af; background:#fff0f6; padding:12px 16px; border-radius:16px; font-weight:700}
+    .gallery{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px}
+    .gallery img{width:100%; height:110px; object-fit:cover; border-radius:12px}
+    .count{font-size:28px; font-weight:900}
+    .footer{margin:24px 0; text-align:center; opacity:.7}
+    .input{padding:10px 12px; border-radius:12px; border:1px solid #eee; width:100%;}
+  </style>
+</head>
+<body>
+  <audio id="bgm" loop>
+    <source src="bgm.mp3" type="audio/mpeg">
+  </audio>
+  <div class="hearts" id="hearts"></div>
+  <canvas id="confetti" style="position:fixed; inset:0; pointer-events:none; z-index:2"></canvas>
+
+  <div class="wrap">
+    <div class="title">
+      <span class="badge">for <span id="herName"></span> 💘</span>
+      <h1>Hi <span id="herName2"></span>，这是一份<span class="pill">万万限定</span>的专属快乐包</h1>
+    </div>
+
+    <div class="grid">
+      <!-- 彩虹屁 -->
+      <section class="card">
+        <h3>今日彩虹屁 🌈</h3>
+        <p id="compliment" class="big">点下面按钮，让我说点肉麻的～</p>
+        <div class="flex">
+          <button onclick="sayNice()">夸  我</button>
+          <span class="muted">（支持多次点击，直到你笑出声）</span>
+        </div>
+      </section>
+
+      <!-- 爱的券 -->
+      <section class="card center">
+        <h3>抽一张爱的券 🎟️</h3>
+        <div id="coupon" class="coupon">点击下方按钮抽取</div>
+        <div style="margin-top:12px"><button onclick="drawCoupon()">我 要 这 张</button></div>
+        <p class="muted">使用方法：出示此券，我必须无条件兑现。</p>
+      </section>
+
+      <!-- 倒计时 -->
+      <section class="card">
+      <h3>在一起时间 💖</h3>
+      <p class="muted">我们从 <span id="anniversaryDisplay"></span> 开始在一起：</p>
+      <div class="count"><span id="togetherTime"></span></div>
+      </section>
+      <!-- 小测验 -->
+      <section class="card">
+        <h3>我有多了解你 ❓</h3>
+        <div id="quiz"></div>
+        <div style="margin-top:8px" class="flex">
+          <button onclick="checkQuiz()">提交答案</button>
+          <span id="quizMsg" class="muted"></span>
+        </div>
+      </section>
+
+      <!-- 回忆相册 -->
+      <section class="card">
+        <h3>回忆相册 📸</h3> 
+        <div class="gallery" id="gallery"></div>
+        <p class="muted">点图片可放大查看（手机上长按保存）。</p>
+      </section>
+
+      <!-- 留言 -->
+      <section class="card">
+        <h3>给你的悄悄话 ✍️</h3>
+        <textarea class="input" id="note" rows="4" placeholder="在这里写下今天想对你说的话……"></textarea>
+        <div style="margin-top:8px" class="flex">
+          <button onclick="saveNote()">保存</button>
+          <span id="noteMsg" class="muted"></span>
+        </div>
+      </section>
+
+      <!-- 小彩蛋说明 -->
+      <section class="card">
+        <h3>隐藏彩蛋 🥚</h3>
+        <p class="big">在页面任意处输入 <b>520</b> 有惊喜；摇一摇（或快速双击）会有彩带🎉。</p>
+        <p class="muted">（如果手机没开陀螺仪权限，就用双击吧）</p>
+      </section>
+    </div>
+
+    <div class="footer">Made with ❤️ by <span id="yourName"></span></div>
+  </div>
+</body>
+
+<script>
+  // 设置在一起的开始时间（格式 YYYY, M-1, D, H, M, S）
+const startDate = new Date(2025, 7, 22, 1, 16, 0); // 举例：2023年1月1日12:00:00
+
+function updateTogetherTime() {
+  const now = new Date();
+  let diff = Math.floor((now - startDate) / 1000); // 总秒数
+  const days = Math.floor(diff / (24*3600));
+  diff %= 24*3600;
+  const hours = Math.floor(diff / 3600);
+  diff %= 3600;
+  const minutes = Math.floor(diff / 60);
+  const seconds = diff % 60;
+
+  const str = `${days}天 ${hours}小时 ${minutes}分钟 ${seconds}秒`;
+  document.getElementById('togetherTime').textContent = str;
+}
+
+// 每秒刷新
+setInterval(updateTogetherTime, 1000);
+updateTogetherTime();
+
+// ====== 可自定义区域（改这里就能私人定制） ======
+const CONFIG = {
+  herName: '莲宝宝',           // 女友昵称
+  yourName: '万万',          // 你的昵称
+  anniversary: '2025-08-22', // 纪念日（YYYY-MM-DD）
+  compliments: [
+    '今天的莲莲，又比昨天优秀了',
+    '莲莲的笑像小太阳，照到我心里了',
+    '想把全世界的好心情打包寄给你（收件人：莲莲）',
+    '我最近在减肥，减去没有莲莲的时间',
+    '莲莲一出现，我的大脑就被 Ctrl+S：保存到心里',
+    '喜欢被莲莲拿捏的感觉，轻一点也不行',
+    '所有写不出来的 Bug，都被莲莲的可爱治好了',
+    '莲莲的眼睛里有星星，还有我',
+    '给莲莲一个小心心 ❤（不要嫌小，因为我的整颗都给你了）',
+    '莲莲要开心，开心才能长命百岁',
+  ],
+  coupons: [
+    '本周家务我全包',
+    '电影由你选，我负责爆米花',
+    '不限时肩颈按摩服务一次',
+    '一日三餐全程外卖随你点',
+    '陪逛街到腿软不喊累',
+    '睡前故事 + 早安叫醒服务',
+    '说几句真心话（我保证不皮）',
+    '无条件抱抱券 × 无限续杯',
+    '小旅行计划我来做（吃住行全包）',
+    '你说了算的一天'
+  ],
+  quiz: [
+    { q: '她最爱的奶茶品牌？', a: '霸王茶姬' },
+    { q: '她最想去的城市？', a: '内蒙古' },
+    { q: '她最喜欢的蔬菜？', a: '空心菜梗' },
+  ],
+  gallery: [
+    'images/1.JPG',
+    'images/2.JPG',
+    'images/3.JPG'
+  ]
+};
+// ====== 自定义区结束 ======
+// 背景音乐播放逻辑
+let bgmPlayed = false;
+function playBGM() {
+if (bgmPlayed) return;
+const bgm = document.getElementById('bgm');
+bgm.play().catch(()=>{});
+bgmPlayed = true;
+}
+
+
+// 第一次点击页面任意地方时播放 BGM
+window.addEventListener('click', function autoPlayOnce(){
+playBGM();
+window.removeEventListener('click', autoPlayOnce);
+});
+// 初始化文案
+const $ = s => document.querySelector(s);
+$('#herName').textContent = CONFIG.herName;
+$('#herName2').textContent = CONFIG.herName;
+$('#yourName').textContent = CONFIG.yourName;
+
+// 倒计时
+function updateDays(){
+  const now = new Date();
+  const target = new Date(CONFIG.anniversary + 'T00:00:00');
+  const diff = Math.ceil((target - now) / (1000*60*60*24));
+  $('#days').textContent = diff >= 0 ? diff : Math.abs(diff) + '（已过）';
+}
+setInterval(updateDays, 60*1000);
+
+// 彩虹屁
+function sayNice(){
+  const t = CONFIG.compliments[Math.floor(Math.random()*CONFIG.compliments.length)];
+  $('#compliment').textContent = t;
+  confettiBurst();
+}
+
+// 爱的券
+function drawCoupon(){
+  const t = CONFIG.coupons[Math.floor(Math.random()*CONFIG.coupons.length)];
+  $('#coupon').textContent = t;
+  confettiBurst();
+}
+
+// 小测验
+const quizBox = $('#quiz');
+quizBox.innerHTML = CONFIG.quiz.map((it, idx)=>`
+  <div style="margin:8px 0">
+    <div class="muted">Q${idx+1}：${it.q}</div>
+    <input class="input" id="q${idx}" placeholder="你的答案（简体中文或关键字即可）" />
+  </div>
+`).join('');
+
+function normalize(s){ return (s||'').toString().trim().toLowerCase().replace(/\s+/g,''); }
+function checkQuiz(){
+  let correct = 0;
+  CONFIG.quiz.forEach((it,idx)=>{
+    const v = normalize($('#q'+idx).value);
+    if(v && normalize(it.a).includes(v)) correct++;
+  });
+  const msg = `答对 ${correct}/${CONFIG.quiz.length} 题。` + (correct===CONFIG.quiz.length ? ' 你最懂我啦！' : ' 再努力一下下～');
+  $('#quizMsg').textContent = msg;
+  confettiBurst(correct/CONFIG.quiz.length);
+}
+
+
+// 相册
+const gal = $('#gallery');
+CONFIG.gallery.forEach(src=>{
+  const img = new Image(); img.src = src; img.alt = 'memory';
+  img.onclick = ()=> window.open(src,'_blank');
+  gal.appendChild(img);
+});
+
+// 便签
+(function loadNote(){
+  const key = 'note_'+CONFIG.herName;
+  const val = localStorage.getItem(key);
+  if(val) $('#note').value = val;
+})();
+function saveNote(){
+  const key = 'note_'+CONFIG.herName;
+  localStorage.setItem(key, $('#note').value || '');
+  $('#noteMsg').textContent = '已保存（只保存在你的设备）';
+  setTimeout(()=> $('#noteMsg').textContent='', 2000);
+}
+
+// 飘心心
+(function hearts(){
+  const wrap = $('#hearts');
+  const colors = ['#ff8fab','#ffb3c6','#ffc2d1','#cdb4db','#bde0fe','#a9def9'];
+  for(let i=0;i<40;i++){
+    const h = document.createElement('div');
+    h.className='heart';
+    h.style.left = Math.random()*100 + 'vw';
+    h.style.animationDuration = (6 + Math.random()*6) + 's';
+    h.style.animationDelay = (-Math.random()*6) + 's';
+    h.style.color = colors[i%colors.length];
+    wrap.appendChild(h);
+  }
+})();
+
+document.getElementById('anniversaryDisplay').textContent = CONFIG.anniversary;
+
+// 粉色心心特效
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+let parts = [];
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight }
+window.addEventListener('resize', resize); resize();
+
+
+function confettiBurst(scale=1){
+const n = Math.floor(50 * (0.4 + scale));
+for(let i=0;i<n;i++){
+parts.push({
+x: innerWidth/2,
+y: innerHeight/3,
+vx: (Math.random()-0.5)*6,
+vy: Math.random()*-8-2,
+size: 8 + Math.random()*6,
+a: 1,
+color: `hsl(${330 + Math.random()*20}, 80%, 70%)`
+});
+}
+}
+
+function drawHeart(ctx, x, y, size, color){
+ctx.save();
+ctx.translate(x, y);
+ctx.scale(size/20, size/20);
+ctx.beginPath();
+ctx.moveTo(0, -10);
+ctx.bezierCurveTo(5, -15, 15, -5, 0, 10);
+ctx.bezierCurveTo(-15, -5, -5, -15, 0, -10);
+ctx.closePath();
+ctx.fillStyle = color;
+ctx.fill();
+ctx.restore();
+}
+
+
+function tick(){
+ctx.clearRect(0,0,canvas.width, canvas.height);
+parts.forEach(p=>{
+p.vy += 0.15;
+p.x += p.vx;
+p.y += p.vy;
+p.a -= 0.01;
+ctx.globalAlpha = Math.max(p.a,0);
+drawHeart(ctx, p.x, p.y, p.size, p.color);
+});
+parts = parts.filter(p=>p.a>0 && p.y<innerHeight+20);
+requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+// 摇一摇 or 双击
+let lastTap=0;
+window.addEventListener('devicemotion', (e)=>{
+  const a = e.accelerationIncludingGravity;
+  if(!a) return;
+  const mag = Math.abs(a.x)+Math.abs(a.y)+Math.abs(a.z);
+  if(mag>40) confettiBurst();
+});
+window.addEventListener('dblclick', ()=> confettiBurst());
+
+// 彩蛋：输入 520
+let code='';
+window.addEventListener('keydown', (e)=>{
+  code += e.key; if(code.length>10) code = code.slice(-10);
+  if(code.includes('520')){ confettiBurst(1.2); code=''; }
+});
+</script>
+</html>
